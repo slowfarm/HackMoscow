@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ru.eva.hackmoscow">
 
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:name="ru.eva.hackmoscow.AppController"
+        android:name="ru.eva.hackmoscow.controller.AppController"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <meta-data
+            android:name="com.here.android.maps.appid"
+            android:value="Otn0BXkgfgcX5Ioyt9Yd" />
+        <meta-data
+            android:name="com.here.android.maps.apptoken"
+            android:value="oDozJgQ4GoPGr0heBwOFIQ" />
+        <meta-data
+            android:name="com.here.android.maps.license.key"
+            android:value="F8uc295q3bGkBu2K+/T8FqSI9dZ125gxqt4HCxutirCV5+IyU3bLEatNAlwNPtdQuLfX9RRyZkrztlmFddHEgUp0quazbW3IZtekglvm11TUUWj+yQWGU3K/2hrjewV1J3iEdYC9T2UALvZxWaX2h7IuebWUBbQYRczrk9b736NWD+Rn7U4ecxAu+UBdWVEYv1OBSlxBvEpPMANzTpkXCE+xQ+dEPynYYdfkwTaR4DhwjVEdWNdh0Sxddk22Wyzd2Jw7JzdmyzjdAQOvLbwcvH8UyF0aDwr0I2mPanEAguNdyXJ5CMOfpwE3Fru/AKVkapaWlm4uQj1dALd+D2xvya5ES3KncKhz10U+Yi+Bk9sCqCbjJ767sStpW0Kc6jVBdFDsedaE+Vp7QRaGhPhVwaN4GQLPqm1paPkoTuqI9sbhe3FSOpbqfbM6RPXweT5lrQlRvUp7FUZKnIPkdfK3E79r7imUDzmWTXsY1U1yKECjxbI0UyPHiyISF1G1S6ZzZkQs8fzJo8kekaDA2jp0kwmTTCkNW9GO0FmZG5Xthx1MpqKvI110sQP29cI1Us8rwQMUIXSdBoelwln/m0D4qG6sYlrQJJ/WD1TW7YPwvarhNX6pQnBF7qgp55of5ngL33f0X9RUZf2CanBodSXk0tjNpIgOjQoty1+pYMZoR7g=" />
+
+
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.login.LoginActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" >
@@ -24,14 +42,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.register.RegisterActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" />
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop" />
+            android:name="ru.eva.hackmoscow.activity.main.MainActivity">
+        </activity>
+
+        <meta-data
+            android:name="INTENT_NAME"
+            android:value="com.here.android.tutorial.MapService" />
+        <service android:exported="false" android:label="BasicMapSolutionMapService" android:name="com.here.android.mpa.service.MapService">
+            <intent-filter>
+                <action android:name="com.here.android.tutorial.MapService">
+                </action>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

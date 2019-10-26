@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: :HERE-sdk:@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d1121605132ffd121241ce0a2078c7ac/jetified-HERE-sdk/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d1121605132ffd121241ce0a2078c7ac/jetified-HERE-sdk/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
