@@ -13,5 +13,11 @@
     <string name="engine_init_error">Map engine initialization</string>
     <string name="from">FROM</string>
     <string name="_0">0</string>
+    <string name="fastest">Fastest</string>
+    <string name="shortest">Shortest</string>
+    <string name="balanced">Balanced</string>
+    <string name="car">Car</string>
+    <string name="pedestrian">Pedestrian</string>
+    <string name="public_transport">Public transport</string>
 
 </resources>

@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.google.android.material.chip.Chip;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
@@ -224,12 +225,31 @@ public class MainActivity extends FragmentActivity
         }
         VenueRouteOptions venueRouteOptions = new VenueRouteOptions();
         RouteOptions options = venueRouteOptions.getRouteOptions();
-        options.setRouteType(Type.values()[0]);
-        options.setTransportMode(TransportMode.values()[0]);
+
+        options.setRouteType(getRouteTypeFromChip());;
+        options.setTransportMode(getTransportModeFromChip());
         options.setRouteCount(1);
         venueRouteOptions.setRouteOptions(options);
         RoutingController routingController = m_mapFragment.getRoutingController();
         routingController.calculateCombinedRoute(startLocation, endLocation, venueRouteOptions);
+    }
+
+    private TransportMode getTransportModeFromChip() {
+        if(((Chip) findViewById(R.id.car_chip)).isChecked())
+            return TransportMode.CAR;
+        else if(((Chip) findViewById(R.id.pedestrian_chip)).isChecked())
+            return TransportMode.PEDESTRIAN;
+        else
+            return TransportMode.PUBLIC_TRANSPORT;
+    }
+
+    private Type getRouteTypeFromChip() {
+        if(((Chip) findViewById(R.id.fastest_chip)).isChecked())
+            return Type.FASTEST;
+        else if(((Chip) findViewById(R.id.shortest_chip)).isChecked())
+            return Type.SHORTEST;
+        else
+            return Type.BALANCED;
     }
 
     @Override
