@@ -45,7 +45,6 @@ import com.here.android.mpa.venues3d.BaseLocation;
 import com.here.android.mpa.venues3d.CombinedRoute;
 import com.here.android.mpa.venues3d.DeselectionSource;
 import com.here.android.mpa.venues3d.Level;
-import com.here.android.mpa.venues3d.OutdoorLocation;
 import com.here.android.mpa.venues3d.RoutingController;
 import com.here.android.mpa.venues3d.RoutingController.RoutingControllerListener;
 import com.here.android.mpa.venues3d.Space;
@@ -65,10 +64,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import ru.eva.hackmoscow.R;
 import ru.eva.hackmoscow.activity.login.LoginActivity;
-import ru.eva.hackmoscow.helper.SQLiteHandler;
-import ru.eva.hackmoscow.helper.SessionManager;
 import ru.eva.hackmoscow.controller.VenueFloorsController;
 import ru.eva.hackmoscow.helper.DialogHelper;
+import ru.eva.hackmoscow.helper.SQLiteHandler;
+import ru.eva.hackmoscow.helper.SessionManager;
 
 public class MainActivity extends FragmentActivity
         implements VenueListener, OnGestureListener, RoutingControllerListener, View.OnClickListener, ContractMain.View {
@@ -132,9 +131,10 @@ public class MainActivity extends FragmentActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mPresenter.checkInitComplete(m_initCompleted,query);
+                mPresenter.checkInitComplete(m_initCompleted, query);
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -226,7 +226,8 @@ public class MainActivity extends FragmentActivity
         VenueRouteOptions venueRouteOptions = new VenueRouteOptions();
         RouteOptions options = venueRouteOptions.getRouteOptions();
 
-        options.setRouteType(getRouteTypeFromChip());;
+        options.setRouteType(getRouteTypeFromChip());
+        ;
         options.setTransportMode(getTransportModeFromChip());
         options.setRouteCount(1);
         venueRouteOptions.setRouteOptions(options);
@@ -235,18 +236,18 @@ public class MainActivity extends FragmentActivity
     }
 
     private TransportMode getTransportModeFromChip() {
-        if(((Chip) findViewById(R.id.car_chip)).isChecked())
+        if (((Chip) findViewById(R.id.car_chip)).isChecked())
             return TransportMode.CAR;
-        else if(((Chip) findViewById(R.id.pedestrian_chip)).isChecked())
+        else if (((Chip) findViewById(R.id.pedestrian_chip)).isChecked())
             return TransportMode.PEDESTRIAN;
         else
             return TransportMode.PUBLIC_TRANSPORT;
     }
 
     private Type getRouteTypeFromChip() {
-        if(((Chip) findViewById(R.id.fastest_chip)).isChecked())
+        if (((Chip) findViewById(R.id.fastest_chip)).isChecked())
             return Type.FASTEST;
-        else if(((Chip) findViewById(R.id.shortest_chip)).isChecked())
+        else if (((Chip) findViewById(R.id.shortest_chip)).isChecked())
             return Type.SHORTEST;
         else
             return Type.BALANCED;

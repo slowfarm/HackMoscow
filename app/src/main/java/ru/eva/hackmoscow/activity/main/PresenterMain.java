@@ -86,10 +86,10 @@ public class PresenterMain implements ContractMain.Presenter {
     @Override
     public void checkMapInitError(OnEngineInitListener.Error error) {
         if (error == OnEngineInitListener.Error.NONE) {
-           mView.initSuccess();
+            mView.initSuccess();
         } else {
             String message = "Error : " + error.name() + "\n\n" + error.getDetails();
-           mView.initError(message);
+            mView.initError(message);
         }
     }
 

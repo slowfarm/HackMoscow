@@ -73,8 +73,7 @@ public class RegisterActivity extends Activity {
 
         // Link to Login Screen
         btnLinkToLogin.setOnClickListener(view -> {
-            Intent i = new Intent(getApplicationContext(),
-                    LoginActivity.class);
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(i);
             finish();
         });
@@ -84,23 +83,20 @@ public class RegisterActivity extends Activity {
     /**
      * Function to store user in MySQL database will post params(tag, name,
      * email, password) to register url
-     * */
-    private void registerUser(final String email,
-                              final String password) {
+     */
+    private void registerUser(final String email, final String password) {
         // Tag used to cancel the request
         String tag_string_req = "req_register";
 
         pDialog.setMessage("Registering ...");
         showDialog();
 
-                        db.addUser(email);
+        db.addUser(email);
 
-                        Toast.makeText(getApplicationContext(), "User successfully registered. Try login now!", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(
-                                RegisterActivity.this,
-                                LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+        Toast.makeText(getApplicationContext(), "User successfully registered. Try login now!", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showDialog() {
