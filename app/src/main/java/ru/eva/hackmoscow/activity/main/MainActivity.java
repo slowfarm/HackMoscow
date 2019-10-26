@@ -191,7 +191,9 @@ public class MainActivity extends FragmentActivity
         m_mapFragment.getRoutingController().addListener(this);
         m_mapFragment.getMapGesture().addOnGestureListener(this, 0, false);
         m_initCompleted.set(true);
-        VenueFloorsController m_floorsController = new VenueFloorsController(this, m_mapFragment, findViewById(R.id.floorListView), R.layout.floor_item, R.id.floorName, R.id.floorGroundSep);
+
+        new VenueFloorsController(this, m_mapFragment, findViewById(R.id.floorListView), R.layout.floor_item, R.id.floorName, R.id.floorGroundSep);
+
         PositioningManager positioningManager = PositioningManager.getInstance();
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
         PositionIndicator positionIndicator = m_mapFragment.getPositionIndicator();
@@ -227,7 +229,7 @@ public class MainActivity extends FragmentActivity
         RouteOptions options = venueRouteOptions.getRouteOptions();
 
         options.setRouteType(getRouteTypeFromChip());
-        ;
+
         options.setTransportMode(getTransportModeFromChip());
         options.setRouteCount(1);
         venueRouteOptions.setRouteOptions(options);
@@ -286,6 +288,7 @@ public class MainActivity extends FragmentActivity
         } else if (fromToButton.getText().toString().equals("TO")) {
             endLocation = location;
             fromToButton.setText("FROM");
+            fromToButton.setEnabled(false);
             calculateRoute();
         }
     }
@@ -388,6 +391,7 @@ public class MainActivity extends FragmentActivity
 
         String textResult = (result ? "The route is built" : "Route built fail");
         showToast(textResult);
+        fromToButton.setEnabled(true);
         m_map.removeMapObject(mapMarker);
     }
 
