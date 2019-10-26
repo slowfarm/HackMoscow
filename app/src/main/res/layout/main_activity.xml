@@ -14,7 +14,7 @@
             android:layout_height="fill_parent" />
 
         <LinearLayout
-            android:layout_width="48dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
@@ -61,6 +61,6 @@
         <include
             android:id="@+id/m_route_info_layout"
             layout="@layout/fragment_routing"
-            android:visibility="gone"></include>
+            android:visibility="gone" />
     </RelativeLayout>
 </RelativeLayout>

@@ -16,16 +16,16 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="8dp"
-            android:background="@drawable/ic_close"
-            android:onClick="onHideRoutingPanelClick" />
+            android:background="@drawable/ic_close" />
 
         <Button
             android:id="@+id/from_to_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:onClick="onFromToButtonClick"
-            android:text="Отсюда" />
+            android:background="@color/btn_login_bg"
+            android:textColor="@color/btn_login"
+            android:text="@string/from" />
 
     </LinearLayout>
 

@@ -2,10 +2,16 @@ package ru.eva.hackmoscow.activity.main;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.here.android.mpa.common.OnEngineInitListener;
+import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.venues3d.BaseLocation;
+import com.here.android.mpa.venues3d.OutdoorLocation;
 import com.here.android.mpa.venues3d.VenueService;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 
@@ -22,6 +28,10 @@ class ContractMain {
         void initError(String message);
 
         void initResult();
+
+        void openVenueAsync(String query);
+
+        void addToRoute(BaseLocation outdoorLocation);
     }
 
     interface Presenter {
@@ -34,6 +44,10 @@ class ContractMain {
         void checkMapInitError(OnEngineInitListener.Error error);
 
         void checkMapInitResult(VenueService.InitStatus result);
+
+        void checkInitComplete(AtomicBoolean m_initCompleted, String query);
+
+        void calculateCenterScreenPoint(Map m_map, Context context);
     }
 
     interface Repository {

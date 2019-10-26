@@ -18,11 +18,13 @@ package ru.eva.hackmoscow.activity.main;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -61,13 +63,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import ru.eva.hackmoscow.R;
+import ru.eva.hackmoscow.activity.login.LoginActivity;
 import ru.eva.hackmoscow.helper.SQLiteHandler;
 import ru.eva.hackmoscow.helper.SessionManager;
 import ru.eva.hackmoscow.controller.VenueFloorsController;
 import ru.eva.hackmoscow.helper.DialogHelper;
 
 public class MainActivity extends FragmentActivity
-        implements VenueListener, OnGestureListener, RoutingControllerListener, ContractMain.View {
+        implements VenueListener, OnGestureListener, RoutingControllerListener, View.OnClickListener, ContractMain.View {
 
     private Map m_map = null;
     private VenueMapFragment m_mapFragment = null;
@@ -75,6 +78,7 @@ public class MainActivity extends FragmentActivity
     private MapMarker mapMarker;
 
     private Button fromToButton;
+    private ImageButton hideRoutingButton;
     private View m_routeInfoLayout;
     private SearchView searchView;
 
@@ -84,7 +88,6 @@ public class MainActivity extends FragmentActivity
     private boolean m_is_routing_mode = false;
 
     private VenueController m_currentVenue;
-    private VenueFloorsController m_floorsController = null;
 
     ContractMain.Presenter mPresenter;
 
@@ -96,43 +99,41 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        mPresenter = new PresenterMain(this);
-        mPresenter.checkPermission(this);
-
         db = new SQLiteHandler(getApplicationContext());
 
         // session manager
         session = new SessionManager(getApplicationContext());
 
         if (!session.isLoggedIn()) {
-            //logoutUser();
+            logoutUser();
         }
-
-        // Fetching user details from SQLite
         HashMap<String, String> user = db.getUserDetails();
 
         String name = user.get("name");
         String email = user.get("email");
+
+        mPresenter = new PresenterMain(this);
+        mPresenter.checkPermission(this);
     }
+
 
     @Override
     public void initializeView() {
         m_mapFragment = (VenueMapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
         m_routeInfoLayout = findViewById(R.id.m_route_info_layout);
         fromToButton = findViewById(R.id.from_to_button);
+        hideRoutingButton = findViewById(R.id.hide_routing_button);
+
+        hideRoutingButton.setOnClickListener(this);
+        fromToButton.setOnClickListener(this);
 
         searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (m_initCompleted.get()) {
-                    openVenueAsync(query);
-                } else {
-                    showToast("Initialization is incomplete, please, check logs");
-                }
+                mPresenter.checkInitComplete(m_initCompleted,query);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -140,6 +141,28 @@ public class MainActivity extends FragmentActivity
         });
 
         mPresenter.checkMapPermission(getPackageManager(), this);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.from_to_button:
+                if (!m_is_routing_mode) {
+                    return;
+                }
+                mPresenter.calculateCenterScreenPoint(m_map, this);
+                break;
+
+            case R.id.hide_routing_button:
+                m_routeInfoLayout.setVisibility(View.GONE);
+                m_is_routing_mode = false;
+                m_mapFragment.getRoutingController().hideRoute();
+                m_map.removeMapObject(mapMarker);
+                fromToButton.setText("FROM");
+                searchView.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     @Override
@@ -161,27 +184,25 @@ public class MainActivity extends FragmentActivity
     @Override
     public void initResult() {
         m_mapFragment.addListener(this);
-
         m_mapFragment.setFloorChangingAnimation(true);
         m_mapFragment.setVenueEnteringAnimation(true);
-
         m_mapFragment.setVenuesInViewportCallback(true);
-
         m_mapFragment.getRoutingController().addListener(this);
-
         m_mapFragment.getMapGesture().addOnGestureListener(this, 0, false);
-
         m_initCompleted.set(true);
-
-        m_floorsController = new VenueFloorsController(this, m_mapFragment,
-                findViewById(R.id.floorListView), R.layout.floor_item,
-                R.id.floorName, R.id.floorGroundSep);
-
+        VenueFloorsController m_floorsController = new VenueFloorsController(this, m_mapFragment, findViewById(R.id.floorListView), R.layout.floor_item, R.id.floorName, R.id.floorGroundSep);
         PositioningManager positioningManager = PositioningManager.getInstance();
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-
         PositionIndicator positionIndicator = m_mapFragment.getPositionIndicator();
         positionIndicator.setVisible(true);
+    }
+
+    private void logoutUser() {
+        session.setLogin(false);
+        db.deleteUsers();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -196,50 +217,34 @@ public class MainActivity extends FragmentActivity
     }
 
 
-    public void onHideRoutingPanelClick(View v) {
-        m_routeInfoLayout.setVisibility(View.GONE);
-        m_is_routing_mode = false;
-        m_mapFragment.getRoutingController().hideRoute();
-        m_map.removeMapObject(mapMarker);
-        fromToButton.setText("Отсюда");
-        searchView.setVisibility(View.VISIBLE);
-    }
-
-
-
     public void calculateRoute() {
         if ((startLocation == null) || (endLocation == null)) {
             showToast("you have to set start and stop point");
             return;
         }
-
         VenueRouteOptions venueRouteOptions = new VenueRouteOptions();
         RouteOptions options = venueRouteOptions.getRouteOptions();
-
         options.setRouteType(Type.values()[0]);
-
         options.setTransportMode(TransportMode.values()[0]);
-
         options.setRouteCount(1);
         venueRouteOptions.setRouteOptions(options);
         RoutingController routingController = m_mapFragment.getRoutingController();
-
-
         routingController.calculateCombinedRoute(startLocation, endLocation, venueRouteOptions);
     }
 
-    private void openVenueAsync(String venueId) {
+    @Override
+    public void openVenueAsync(String venueId) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 
-        VenueInfo result = m_mapFragment.selectVenueAsync("DM_"+venueId);
+        VenueInfo result = m_mapFragment.selectVenueAsync("DM_" + venueId);
         String textResult = "NOT IN THE INDEX FILE";
         if (result != null) {
             textResult = "TRYING TO OPEN...";
             m_map.setCenter(result.getBoundingBox().getCenter(), Animation.NONE, 17, 0, 1);
         }
 
-        showToast("Open venue async:" + textResult);
+        showToast("Open venue:" + textResult);
     }
 
     @Override
@@ -251,20 +256,16 @@ public class MainActivity extends FragmentActivity
     }
 
     @Override
-    public void onVenueDeselected(Venue venue, DeselectionSource source) {
-    }
-
-    private void addToRoute(BaseLocation location, String uiText) {
-        if (fromToButton.getText().toString().equals("Отсюда")) {
+    public void addToRoute(BaseLocation location) {
+        if (fromToButton.getText().toString().equals("FROM")) {
             startLocation = location;
-            fromToButton.setText("Сюда");
+            fromToButton.setText("TO");
             mapMarker = new MapMarker(location.getGeoCoordinate());
             m_map.addMapObject(mapMarker);
-        } else if (fromToButton.getText().toString().equals("Сюда")) {
+        } else if (fromToButton.getText().toString().equals("TO")) {
             endLocation = location;
-            fromToButton.setText("Отсюда");
+            fromToButton.setText("FROM");
             calculateRoute();
-            m_map.removeMapObject(mapMarker);
         }
     }
 
@@ -274,9 +275,7 @@ public class MainActivity extends FragmentActivity
             onSpaceSelectedMapMode(space);
             return;
         }
-
-        String uiText = space.getContent().getName();
-        addToRoute(new SpaceLocation(space, m_mapFragment.getVenueController(venue)), uiText);
+        addToRoute(new SpaceLocation(space, m_mapFragment.getVenueController(venue)));
     }
 
     @SuppressLint("DefaultLocale")
@@ -285,46 +284,19 @@ public class MainActivity extends FragmentActivity
         return false;
     }
 
-    public void onFromToButtonClick(View v) {
-        if (!m_is_routing_mode) {
-            return;
-        }
-        int mWidth= this.getResources().getDisplayMetrics().widthPixels;
-        int mHeight= this.getResources().getDisplayMetrics().heightPixels;
-        PointF p = new PointF(mWidth/2, mHeight/2);
-        GeoCoordinate touchLocation = m_map.pixelToGeo(p);
-        double lat = touchLocation.getLatitude();
-        double lon = touchLocation.getLongitude();
-        String StrGeo = String.format("%.6f, %.6f", lat, lon);
-        showToast(StrGeo);
-        addToRoute(new OutdoorLocation(touchLocation), StrGeo);
-    }
 
     private void onSpaceSelectedMapMode(Space space) {
 
         String spaceName = space.getContent().getName();
         String parentCategory = space.getContent().getParentCategoryId();
         String placeCategory = space.getContent().getPlaceCategoryId();
-        Toast.makeText(getApplicationContext(), "Space " + spaceName + ", parent category: "
-                + parentCategory + ", place category: " + placeCategory, Toast.LENGTH_SHORT).show();
+        showToast("Space:" + spaceName + ",\nparent category: " + parentCategory + ", \nplace category: " + placeCategory);
 
         Address address = space.getContent().getAddress();
         if (address != null) {
             System.out.println("Space address: " + address.getStreet() + " " + address.getPostalCode() + " " + address.getCity());
             System.out.println("Space floor: " + address.getFloorNumber() + " place cat: " + space.getContent().getPlaceCategoryId());
         }
-    }
-
-    @Override
-    public void onSpaceDeselected(Venue venue, Space space) {
-    }
-
-    @Override
-    public void onFloorChanged(Venue venue, Level oldLevel, Level newLevel) {
-    }
-
-    @Override
-    public void onVenueVisibleInViewport(Venue venue, boolean visible) {
     }
 
     @Override
@@ -372,6 +344,46 @@ public class MainActivity extends FragmentActivity
         m_is_routing_mode = true;
         m_map.setCenter(point, Animation.BOW, m_map.getZoomLevel(), 0, 1);
         return false;
+    }
+
+    private boolean DisplayRoute(CombinedRoute route) {
+        RoutingController routingController = m_mapFragment.getRoutingController();
+        routingController.showRoute(route);
+        return true;
+    }
+
+    @Override
+    public void onCombinedRouteCompleted(CombinedRoute route) {
+        boolean result = false;
+        RoutingController routingController = m_mapFragment.getRoutingController();
+
+        if (route.getRouteSections().size() > 0) {
+            result = DisplayRoute(route);
+        }
+
+        if (!result) {
+            routingController.hideRoute();
+        }
+
+        String textResult = (result ? "The route is built" : "Route built fail");
+        showToast(textResult);
+        m_map.removeMapObject(mapMarker);
+    }
+
+    @Override
+    public void onVenueDeselected(Venue venue, DeselectionSource source) {
+    }
+
+    @Override
+    public void onSpaceDeselected(Venue venue, Space space) {
+    }
+
+    @Override
+    public void onFloorChanged(Venue venue, Level oldLevel, Level newLevel) {
+    }
+
+    @Override
+    public void onVenueVisibleInViewport(Venue venue, boolean visible) {
     }
 
     @Override
@@ -427,28 +439,5 @@ public class MainActivity extends FragmentActivity
         return false;
     }
 
-    private boolean DisplayRoute(CombinedRoute route) {
-        RoutingController routingController = m_mapFragment.getRoutingController();
-        routingController.showRoute(route);
-        return true;
-    }
-
-    @Override
-    public void onCombinedRouteCompleted(CombinedRoute route) {
-        boolean result = false;
-        RoutingController routingController = m_mapFragment.getRoutingController();
-
-        if (route.getRouteSections().size() > 0) {
-            result = DisplayRoute(route);
-        }
-
-        if (!result) {
-            routingController.hideRoute();
-        }
-
-        String textResult = "Combined route result:" + (result ? "SUCCESS" : "FAIL");
-        Toast.makeText(getApplicationContext(), textResult, Toast.LENGTH_SHORT).show();
-
-    }
 
 }

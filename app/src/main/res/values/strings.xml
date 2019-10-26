@@ -11,5 +11,7 @@
     <string name="btn_logout">LOGOUT</string>
     <string name="name">Fullname</string>
     <string name="engine_init_error">Map engine initialization</string>
+    <string name="from">FROM</string>
+    <string name="_0">0</string>
 
 </resources>

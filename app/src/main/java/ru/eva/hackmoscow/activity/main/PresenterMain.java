@@ -5,14 +5,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
+import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.venues3d.OutdoorLocation;
 import com.here.android.mpa.venues3d.VenueService;
 import com.here.odnp.util.Log;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -93,6 +98,24 @@ public class PresenterMain implements ContractMain.Presenter {
         if (result == VenueService.InitStatus.ONLINE_SUCCESS || result == VenueService.InitStatus.OFFLINE_SUCCESS) {
             mView.initResult();
         }
+    }
+
+    @Override
+    public void checkInitComplete(AtomicBoolean m_initCompleted, String query) {
+        if (m_initCompleted.get()) {
+            mView.openVenueAsync(query);
+        } else {
+            mView.showToast("Initialization is incomplete, please, check logs");
+        }
+    }
+
+    @Override
+    public void calculateCenterScreenPoint(Map m_map, Context context) {
+        int mWidth = context.getResources().getDisplayMetrics().widthPixels;
+        int mHeight = context.getResources().getDisplayMetrics().heightPixels;
+        PointF p = new PointF(mWidth / 2, mHeight / 2);
+        GeoCoordinate touchLocation = m_map.pixelToGeo(p);
+        mView.addToRoute(new OutdoorLocation(touchLocation));
     }
 
     private static boolean hasPermissions(Context context, String... permissions) {
