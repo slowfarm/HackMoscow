@@ -45,6 +45,7 @@ import com.here.android.mpa.venues3d.BaseLocation;
 import com.here.android.mpa.venues3d.CombinedRoute;
 import com.here.android.mpa.venues3d.DeselectionSource;
 import com.here.android.mpa.venues3d.Level;
+import com.here.android.mpa.venues3d.OutdoorLocation;
 import com.here.android.mpa.venues3d.RoutingController;
 import com.here.android.mpa.venues3d.RoutingController.RoutingControllerListener;
 import com.here.android.mpa.venues3d.Space;
@@ -68,6 +69,8 @@ import ru.eva.hackmoscow.controller.VenueFloorsController;
 import ru.eva.hackmoscow.helper.DialogHelper;
 import ru.eva.hackmoscow.helper.SQLiteHandler;
 import ru.eva.hackmoscow.helper.SessionManager;
+import ru.eva.hackmoscow.model.Feature;
+import ru.eva.hackmoscow.model.Geodata;
 
 public class MainActivity extends FragmentActivity
         implements VenueListener, OnGestureListener, RoutingControllerListener, View.OnClickListener, ContractMain.View {
@@ -169,12 +172,13 @@ public class MainActivity extends FragmentActivity
     @Override
     public void initializeMap() {
         m_mapFragment.init(error -> mPresenter.checkMapInitError(error), result -> mPresenter.checkMapInitResult(result));
+        mPresenter.getGeodata("", "");
     }
 
     @Override
     public void initSuccess() {
         m_map = m_mapFragment.getMap();
-        m_map.setCenter(new GeoCoordinate(49.196261, -123.004773, 0.0), Animation.NONE);
+        m_map.setCenter(new GeoCoordinate(55.815532, 37.575526, 0.0), Animation.NONE);
     }
 
     @Override
@@ -200,6 +204,15 @@ public class MainActivity extends FragmentActivity
         positionIndicator.setVisible(true);
     }
 
+    @Override
+    public void setMarkers(List<Feature> featureList) {
+        if (featureList.size() != 0) {
+            m_map.setCenter(new GeoCoordinate(featureList.get(0).getGeometry().getCoordinates().get(1), featureList.get(0).getGeometry().getCoordinates().get(0)), Animation.BOW);
+            calculateMultipleLocationRoute(featureList);
+        }
+
+    }
+
     private void logoutUser() {
         session.setLogin(false);
         db.deleteUsers();
@@ -220,7 +233,7 @@ public class MainActivity extends FragmentActivity
     }
 
 
-    public void calculateRoute() {
+    private void calculateRoute() {
         if ((startLocation == null) || (endLocation == null)) {
             showToast("you have to set start and stop point");
             return;
@@ -235,6 +248,26 @@ public class MainActivity extends FragmentActivity
         venueRouteOptions.setRouteOptions(options);
         RoutingController routingController = m_mapFragment.getRoutingController();
         routingController.calculateCombinedRoute(startLocation, endLocation, venueRouteOptions);
+    }
+
+    private void calculateMultipleLocationRoute(List<Feature> featureList) {
+        BaseLocation[] baseLocations = new BaseLocation[featureList.size() - 1];
+        for (int i = 0; i < featureList.size() - 1; i++) {
+            double latitude = featureList.get(i).getGeometry().getCoordinates().get(1);
+            double longitude = featureList.get(i).getGeometry().getCoordinates().get(0);
+            baseLocations[i] = new OutdoorLocation(new GeoCoordinate(latitude, longitude));
+        }
+
+        VenueRouteOptions venueRouteOptions = new VenueRouteOptions();
+        RouteOptions options = venueRouteOptions.getRouteOptions();
+
+        options.setRouteType(getRouteTypeFromChip());
+
+        options.setTransportMode(getTransportModeFromChip());
+        options.setRouteCount(1);
+        venueRouteOptions.setRouteOptions(options);
+        RoutingController routingController = m_mapFragment.getRoutingController();
+        routingController.calculateCombinedRoute(baseLocations, venueRouteOptions);
     }
 
     private TransportMode getTransportModeFromChip() {

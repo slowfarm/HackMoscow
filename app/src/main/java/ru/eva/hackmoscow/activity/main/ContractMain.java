@@ -8,12 +8,15 @@ import android.content.pm.PackageManager;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.venues3d.BaseLocation;
-import com.here.android.mpa.venues3d.OutdoorLocation;
 import com.here.android.mpa.venues3d.VenueService;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
+import ru.eva.hackmoscow.OnGeodataRecieved;
+import ru.eva.hackmoscow.model.Feature;
+import ru.eva.hackmoscow.model.Geodata;
 
 class ContractMain {
     interface View {
@@ -32,6 +35,8 @@ class ContractMain {
         void openVenueAsync(String query);
 
         void addToRoute(BaseLocation outdoorLocation);
+
+        void setMarkers(List<Feature> featureList);
     }
 
     interface Presenter {
@@ -48,8 +53,11 @@ class ContractMain {
         void checkInitComplete(AtomicBoolean m_initCompleted, String query);
 
         void calculateCenterScreenPoint(Map m_map, Context context);
+
+        void getGeodata(String spaceId, String id);
     }
 
     interface Repository {
+        void getGeodata(String spaceId, String id, OnGeodataRecieved onGeodataRecieved);
     }
 }

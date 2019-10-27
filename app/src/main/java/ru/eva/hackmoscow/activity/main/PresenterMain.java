@@ -17,12 +17,17 @@ import com.here.android.mpa.venues3d.VenueService;
 import com.here.odnp.util.Log;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import ru.eva.hackmoscow.OnGeodataRecieved;
+import ru.eva.hackmoscow.model.Feature;
+import ru.eva.hackmoscow.model.Geodata;
 
-public class PresenterMain implements ContractMain.Presenter {
+public class PresenterMain implements ContractMain.Presenter, OnGeodataRecieved {
 
     private ContractMain.View mView;
     private ContractMain.Repository mRepository;
@@ -127,5 +132,30 @@ public class PresenterMain implements ContractMain.Presenter {
             }
         }
         return true;
+    }
+
+    @Override
+    public void getGeodata(String spaceId, String id) {
+        mRepository.getGeodata(spaceId, id, this);
+    }
+
+
+    @Override
+    public void onResponse(Geodata geodata) {
+        if (geodata != null) {
+            List<Feature> featureList = new ArrayList<>();
+            featureList.add(geodata.getFeatures().get(0));
+            for (int i = 1; i < geodata.getFeatures().size(); i++) {
+                if (geodata.getFeatures().get(i).getGeometry().getCoordinates().get(0).equals(geodata.getFeatures().get(i - 1).getGeometry().getCoordinates().get(0)))
+                    continue;
+                featureList.add(geodata.getFeatures().get(i));
+            }
+            mView.setMarkers(featureList);
+        }
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
+        mView.showToast(t.getMessage());
     }
 }
