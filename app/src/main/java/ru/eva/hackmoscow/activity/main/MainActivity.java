@@ -172,13 +172,13 @@ public class MainActivity extends FragmentActivity
     @Override
     public void initializeMap() {
         m_mapFragment.init(error -> mPresenter.checkMapInitError(error), result -> mPresenter.checkMapInitResult(result));
-        mPresenter.getGeodata("", "");
     }
 
     @Override
     public void initSuccess() {
         m_map = m_mapFragment.getMap();
         m_map.setCenter(new GeoCoordinate(55.815532, 37.575526, 0.0), Animation.NONE);
+        mPresenter.getGeodata("", "");
     }
 
     @Override
@@ -206,7 +206,7 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void setMarkers(List<Feature> featureList) {
-        if (featureList.size() != 0) {
+        if (featureList != null) {
             m_map.setCenter(new GeoCoordinate(featureList.get(0).getGeometry().getCoordinates().get(1), featureList.get(0).getGeometry().getCoordinates().get(0)), Animation.BOW);
             calculateMultipleLocationRoute(featureList);
         }

@@ -19,5 +19,6 @@
     <string name="car">Car</string>
     <string name="pedestrian">Pedestrian</string>
     <string name="public_transport">Public transport</string>
+    <string name="default_notification_channel_id">default notification channel id</string>
 
 </resources>

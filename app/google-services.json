@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "242291870803",
+    "firebase_url": "https://hackmoscow-93754.firebaseio.com",
+    "project_id": "hackmoscow-93754",
+    "storage_bucket": "hackmoscow-93754.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242291870803:android:1d02a1b1d5f40f72f84aa6",
+        "android_client_info": {
+          "package_name": "ru.eva.hackmoscow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242291870803-q35b45s4rjshakurf512o5153ospn47t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl7CzgqrXZ8I8WG4V6PSdPw6D6-uy6bso"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242291870803-q35b45s4rjshakurf512o5153ospn47t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

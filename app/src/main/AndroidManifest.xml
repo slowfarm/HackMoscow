@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     package="ru.eva.hackmoscow">
 
@@ -28,7 +27,11 @@
         <meta-data
             android:name="com.here.android.maps.license.key"
             android:value="F8uc295q3bGkBu2K+/T8FqSI9dZ125gxqt4HCxutirCV5+IyU3bLEatNAlwNPtdQuLfX9RRyZkrztlmFddHEgUp0quazbW3IZtekglvm11TUUWj+yQWGU3K/2hrjewV1J3iEdYC9T2UALvZxWaX2h7IuebWUBbQYRczrk9b736NWD+Rn7U4ecxAu+UBdWVEYv1OBSlxBvEpPMANzTpkXCE+xQ+dEPynYYdfkwTaR4DhwjVEdWNdh0Sxddk22Wyzd2Jw7JzdmyzjdAQOvLbwcvH8UyF0aDwr0I2mPanEAguNdyXJ5CMOfpwE3Fru/AKVkapaWlm4uQj1dALd+D2xvya5ES3KncKhz10U+Yi+Bk9sCqCbjJ767sStpW0Kc6jVBdFDsedaE+Vp7QRaGhPhVwaN4GQLPqm1paPkoTuqI9sbhe3FSOpbqfbM6RPXweT5lrQlRvUp7FUZKnIPkdfK3E79r7imUDzmWTXsY1U1yKECjxbI0UyPHiyISF1G1S6ZzZkQs8fzJo8kekaDA2jp0kwmTTCkNW9GO0FmZG5Xthx1MpqKvI110sQP29cI1Us8rwQMUIXSdBoelwln/m0D4qG6sYlrQJJ/WD1TW7YPwvarhNX6pQnBF7qgp55of5ngL33f0X9RUZf2CanBodSXk0tjNpIgOjQoty1+pYMZoR7g=" />
-
+        <service android:name="ru.eva.hackmoscow.service.MessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".activity.login.LoginActivity"
@@ -60,6 +63,15 @@
                 </action>
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_launcher" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
+
+
     </application>
 
 </manifest>
