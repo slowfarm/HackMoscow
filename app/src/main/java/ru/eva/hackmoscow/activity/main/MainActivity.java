@@ -29,6 +29,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
@@ -82,6 +83,7 @@ public class MainActivity extends FragmentActivity
 
     private Button fromToButton;
     private ImageButton hideRoutingButton;
+    private FloatingActionButton floatingActionButton;
     private View m_routeInfoLayout;
     private SearchView searchView;
 
@@ -126,7 +128,10 @@ public class MainActivity extends FragmentActivity
         m_routeInfoLayout = findViewById(R.id.m_route_info_layout);
         fromToButton = findViewById(R.id.from_to_button);
         hideRoutingButton = findViewById(R.id.hide_routing_button);
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setEnabled(false);
 
+        floatingActionButton.setOnClickListener(this);
         hideRoutingButton.setOnClickListener(this);
         fromToButton.setOnClickListener(this);
 
@@ -166,6 +171,9 @@ public class MainActivity extends FragmentActivity
                 fromToButton.setText("FROM");
                 searchView.setVisibility(View.VISIBLE);
                 break;
+            case R.id.floatingActionButton:
+                mPresenter.getGeodata("", "");
+                break;
         }
     }
 
@@ -178,7 +186,6 @@ public class MainActivity extends FragmentActivity
     public void initSuccess() {
         m_map = m_mapFragment.getMap();
         m_map.setCenter(new GeoCoordinate(55.815532, 37.575526, 0.0), Animation.NONE);
-        mPresenter.getGeodata("", "");
     }
 
     @Override
@@ -202,6 +209,8 @@ public class MainActivity extends FragmentActivity
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
         PositionIndicator positionIndicator = m_mapFragment.getPositionIndicator();
         positionIndicator.setVisible(true);
+
+        floatingActionButton.setEnabled(true);
     }
 
     @Override
