@@ -71,7 +71,6 @@ import ru.eva.hackmoscow.helper.DialogHelper;
 import ru.eva.hackmoscow.helper.SQLiteHandler;
 import ru.eva.hackmoscow.helper.SessionManager;
 import ru.eva.hackmoscow.model.Feature;
-import ru.eva.hackmoscow.model.Geodata;
 
 public class MainActivity extends FragmentActivity
         implements VenueListener, OnGestureListener, RoutingControllerListener, View.OnClickListener, ContractMain.View {
@@ -81,7 +80,7 @@ public class MainActivity extends FragmentActivity
     private AtomicBoolean m_initCompleted = new AtomicBoolean(false);
     private MapMarker mapMarker;
 
-    private Button fromToButton;
+    private Chip fromToChip;
     private ImageButton hideRoutingButton;
     private FloatingActionButton floatingActionButton;
     private View m_routeInfoLayout;
@@ -126,14 +125,14 @@ public class MainActivity extends FragmentActivity
     public void initializeView() {
         m_mapFragment = (VenueMapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
         m_routeInfoLayout = findViewById(R.id.m_route_info_layout);
-        fromToButton = findViewById(R.id.from_to_button);
+        fromToChip = findViewById(R.id.from_to_chip);
         hideRoutingButton = findViewById(R.id.hide_routing_button);
         floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setEnabled(false);
 
         floatingActionButton.setOnClickListener(this);
         hideRoutingButton.setOnClickListener(this);
-        fromToButton.setOnClickListener(this);
+        fromToChip.setOnClickListener(this);
 
         searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -156,7 +155,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.from_to_button:
+            case R.id.from_to_chip:
                 if (!m_is_routing_mode) {
                     return;
                 }
@@ -168,7 +167,7 @@ public class MainActivity extends FragmentActivity
                 m_is_routing_mode = false;
                 m_mapFragment.getRoutingController().hideRoute();
                 m_map.removeMapObject(mapMarker);
-                fromToButton.setText("FROM");
+                fromToChip.setText("FROM");
                 searchView.setVisibility(View.VISIBLE);
                 break;
             case R.id.floatingActionButton:
@@ -322,15 +321,15 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void addToRoute(BaseLocation location) {
-        if (fromToButton.getText().toString().equals("FROM")) {
+        if (fromToChip.getText().toString().equals("FROM")) {
             startLocation = location;
-            fromToButton.setText("TO");
+            fromToChip.setText("TO");
             mapMarker = new MapMarker(location.getGeoCoordinate());
             m_map.addMapObject(mapMarker);
-        } else if (fromToButton.getText().toString().equals("TO")) {
+        } else if (fromToChip.getText().toString().equals("TO")) {
             endLocation = location;
-            fromToButton.setText("FROM");
-            fromToButton.setEnabled(false);
+            fromToChip.setText("FROM");
+            fromToChip.setEnabled(false);
             calculateRoute();
         }
     }
@@ -433,7 +432,7 @@ public class MainActivity extends FragmentActivity
 
         String textResult = (result ? "The route is built" : "Route built fail");
         showToast(textResult);
-        fromToButton.setEnabled(true);
+        fromToChip.setEnabled(true);
         m_map.removeMapObject(mapMarker);
     }
 
